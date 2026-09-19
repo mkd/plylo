@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  plylo-db:
+    image: postgres:15-alpine
+    container_name: plylo-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: plylo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: plylo
+    volumes:
+      - plylo_pgdata:/var/lib/postgresql/data
+    networks:
+      - claudiocamacho_default
+
+  plylo-api:
+    build: .
+    container_name: plylo-api
+    restart: unless-stopped
+    command: bash -c "alembic upgrade head && uvicorn server.api.main:app --host 0.0.0.0 --port 8000"
+    environment:
+      DATABASE_URL: postgresql://plylo:${POSTGRES_PASSWORD}@plylo-db/plylo
+    depends_on:
+      - plylo-db
+    networks:
+      - claudiocamacho_default
+
+  plylo-worker:
+    build: .
+    container_name: plylo-worker
+    restart: unless-stopped
+    command: python server/jobs/worker.py
+    environment:
+      DATABASE_URL: postgresql://plylo:${POSTGRES_PASSWORD}@plylo-db/plylo
+    depends_on:
+      - plylo-db
+    volumes:
+      - plylo_checkpoints:/app/checkpoints
+    networks:
+      - claudiocamacho_default
+
+  plylo-trainer:
+    build: .
+    container_name: plylo-trainer
+    restart: unless-stopped
+    command: python server/jobs/trainer.py
+    environment:
+      DATABASE_URL: postgresql://plylo:${POSTGRES_PASSWORD}@plylo-db/plylo
+    depends_on:
+      - plylo-db
+    volumes:
+      - plylo_checkpoints:/app/checkpoints
+    networks:
+      - claudiocamacho_default
+
+volumes:
+  plylo_pgdata:
+  plylo_checkpoints:
+
+networks:
+  claudiocamacho_default:
+    external: true

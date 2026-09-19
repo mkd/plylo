@@ -1,0 +1,589 @@
+/* ──────────────────────────────────────────────
+   Plylo – Lichess-inspired dark theme
+   ────────────────────────────────────────────── */
+
+:root {
+  --bg-dark:    #161512;
+  --bg-panel:   #1f1e1b;
+  --bg-panel2:  #272522;
+  --bg-header:  #1a1917;
+  --accent:     #629924;
+  --accent-hover: #7ab829;
+  --text-main:  #bababa;
+  --text-bright:#e0e0e0;
+  --text-dim:   #8a8a8a;
+  --border:     #3a3834;
+  --danger:     #cc3333;
+  --win:        #629924;
+  --draw:       #999;
+  --loss:       #cc3333;
+  --board-light:#f0d9b5;
+  --board-dark: #b58863;
+}
+
+/* ── Layout ─────────────────────────────────── */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-dark);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+  height: 48px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.header h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  letter-spacing: 0.5px;
+  margin-right: auto;
+}
+
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.stats span {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── Tabs ───────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 0;
+}
+
+.tabs button {
+  background: transparent;
+  color: var(--text-dim);
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tabs button:hover {
+  color: var(--text-bright);
+}
+
+.tabs button.active {
+  color: var(--text-bright);
+  border-bottom-color: var(--accent);
+}
+
+/* ── Main Content ───────────────────────────── */
+
+.main-content {
+  display: flex;
+  flex: 1;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Sidebar / Panel ────────────────────────── */
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--bg-panel);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 80px);
+}
+
+.setup-panel h2,
+.active-panel h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin: 0 0 0.5rem;
+}
+
+.setup-panel,
+.active-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.control-group > label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Form Elements ──────────────────────────── */
+
+select,
+input[type="number"] {
+  background: var(--bg-panel2);
+  color: var(--text-bright);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+select:focus,
+input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+input[type="range"] {
+  accent-color: var(--accent);
+  width: 100%;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+  margin-right: 0.35rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.age-slider {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.age-slider input[type="range"] {
+  flex: 1;
+}
+
+.age-slider input[type="number"] {
+  width: 60px;
+}
+
+/* ── Buttons ────────────────────────────────── */
+
+button {
+  font-family: inherit;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-panel2);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--border);
+  color: var(--text-bright);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #dd4444;
+}
+
+.btn-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+}
+
+.btn-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ── Board Container ────────────────────────── */
+
+.board-wrapper {
+  position: relative;
+  width: min(100%, 75vh);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* ── Game Over Banner ───────────────────────── */
+
+.game-over-banner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10;
+  border-radius: 4px;
+}
+
+.game-over-inner {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+
+.game-over-inner h3 {
+  color: var(--text-bright);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.game-over-inner p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* ── Move List ──────────────────────────────── */
+
+.move-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.move-list h3 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.moves-grid {
+  display: grid;
+  grid-template-columns: 28px 1fr 1fr;
+  gap: 1px;
+  font-size: 0.85rem;
+  overflow-y: auto;
+  max-height: 300px;
+  background: var(--bg-panel2);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.move-number {
+  padding: 0.2rem 0.3rem;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  background: var(--bg-dark);
+}
+
+.move-cell {
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: background 0.1s;
+}
+
+.move-cell:hover {
+  background: var(--border);
+}
+
+.move-cell.active {
+  background: var(--accent);
+  color: white;
+}
+
+.move-cell.empty {
+  cursor: default;
+}
+
+/* ── Flip Button ────────────────────────────── */
+
+.flip-btn {
+  background: var(--bg-panel2);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  width: fit-content;
+}
+
+.flip-btn:hover {
+  background: var(--border);
+  color: var(--text-bright);
+}
+
+/* ── Explorer ───────────────────────────────── */
+
+.explorer-sidebar {
+  width: 360px;
+}
+
+.explorer-stats {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.next-moves h3 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0.5rem 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+thead th {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+tbody td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--bg-dark);
+  color: var(--text-main);
+}
+
+.explorer-move-row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.explorer-move-row:hover {
+  background: var(--bg-panel2);
+}
+
+.explorer-move-row td:first-child {
+  color: var(--text-bright);
+  font-weight: 600;
+}
+
+.win-count  { color: var(--win); }
+.draw-count { color: var(--draw); }
+.loss-count { color: var(--loss); }
+
+.empty-state {
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 0.85rem;
+  padding: 1rem 0;
+}
+
+/* ── Archive ────────────────────────────────── */
+
+.archive-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.archive-container h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin: 0 0 0.5rem;
+}
+
+.archive-container > p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 1rem;
+}
+
+.archive-table th {
+  background: var(--bg-dark);
+}
+
+.archive-table a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.archive-table a:hover {
+  text-decoration: underline;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* ── Waiting / Status ───────────────────────── */
+
+.waiting-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  padding: 0.35rem 0;
+}
+
+.waiting-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ── Responsive ─────────────────────────────── */
+
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column-reverse;
+    align-items: center;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .sidebar,
+  .explorer-sidebar {
+    width: 100%;
+    max-height: none;
+  }
+
+  .board-wrapper {
+    width: min(100%, calc(100vw - 2rem));
+  }
+
+  .header {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .header h1 {
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .stats {
+    width: 100%;
+    justify-content: center;
+  }
+}
+.promotion-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  z-index: 100;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.promotion-pieces {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.promotion-pieces button {
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text);
+}
+.promotion-pieces button:hover {
+  background: var(--accent);
+  color: white;
+}
