@@ -2,7 +2,7 @@
 
 Plylo is a continuous-learning, AlphaZero-style chess engine with a modern web interface. Unlike traditional chess engines that use hardcoded rules or heuristics, Plylo starts out knowing absolutely nothing except how the pieces move, and learns entirely by playing against itself and against human opponents.
 
-![Plylo Chess Board](docs/assets/board.png)
+![Plylo Chess Board](docs/assets/archive.png)
 
 ## Features
 
