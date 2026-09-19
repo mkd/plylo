@@ -159,6 +159,7 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
   const [moveFrom, setMoveFrom] = useState<string | null>(null);
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [showPromo, setShowPromo] = useState(false);
+  const [promoColor, setPromoColor] = useState<'w' | 'b'>('w');
 
   /* ── Piece Drop (react-chessboard v5 API) ── */
   const handleDrop = useCallback(({ piece, sourceSquare, targetSquare }: any) => {
@@ -176,15 +177,15 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
     }
 
     // Detect promotion
-    const isPawn = piece?.pieceType?.toLowerCase?.() === 'p'
-                || (typeof piece === 'string' && piece[1] === 'P')
-                || (typeof piece === 'string' && piece[1] === 'p');
+    const pType = typeof piece === 'string' ? piece : piece?.pieceType || '';
+    const isPawn = pType.length >= 2 && pType[1].toLowerCase() === 'p';
     const promoRank = chess.turn() === 'w' ? '8' : '1';
-    const isPromo = isPawn && targetSquare[1] === promoRank;
+    const isPromo = isPawn && targetSquare && targetSquare[1] === promoRank;
 
     if (isPromo) {
       setMoveFrom(sourceSquare);
       setMoveTo(targetSquare);
+      setPromoColor(chess.turn());
       setShowPromo(true);
       return false; // Wait for dialog
     }
@@ -239,7 +240,8 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
 
   const onPromotionPieceSelect = (piece?: string) => {
     if (piece && moveFrom && moveTo) {
-      const promo = piece[1].toLowerCase(); // e.g. "wQ" -> "q"
+      // Piece from our custom dialog is already 'q', 'r', 'b', or 'n'
+      const promo = piece.toLowerCase(); 
       executeMove(moveFrom, moveTo, promo);
     }
     setShowPromo(false);
@@ -404,11 +406,18 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
           <div className="promotion-dialog">
             <p>Promote to:</p>
             <div className="promotion-pieces">
-              {['q', 'r', 'b', 'n'].map(p => (
-                <button key={p} onClick={() => onPromotionPieceSelect(p)}>
-                  {p.toUpperCase()}
-                </button>
-              ))}
+              {['q', 'r', 'b', 'n'].map(p => {
+                const symbols = {
+                  w: { q: '♕', r: '♖', b: '♗', n: '♘' },
+                  b: { q: '♛', r: '♜', b: '♝', n: '♞' }
+                };
+                const symbol = symbols[promoColor][p as 'q'|'r'|'b'|'n'];
+                return (
+                  <button key={p} onClick={() => onPromotionPieceSelect(p)} className="piece-btn">
+                    {symbol}
+                  </button>
+                );
+              })}
             </div>
             <button className="btn btn-secondary btn-small" onClick={() => onPromotionPieceSelect()}>Cancel</button>
           </div>
