@@ -254,12 +254,31 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
   const handleResign = async () => {
     if (!game) return;
     await axios.post(`${API}/games/${game.id}/resign`).catch(() => {});
+    setGame({ ...game, state: 'completed', result: game.visitor_color === 'white' ? -1.0 : 1.0, termination: 'resign' });
+    stopPolling();
   };
 
   /* ── Abort ── */
   const handleAbort = async () => {
     if (!game) return;
     await axios.post(`${API}/games/${game.id}/abort`).catch(() => {});
+    setGame({ ...game, state: 'completed', result: 0.0, termination: 'abort' });
+    stopPolling();
+  };
+
+  /* ── Takeback ── */
+  const handleTakeback = async () => {
+    if (!game || game.moves.length < 2) return;
+    await axios.post(`${API}/games/${game.id}/takeback`).catch(() => {});
+    // Remove last 2 moves locally to feel instant
+    const newMoves = game.moves.slice(0, -2);
+    setGame({ ...game, moves: newMoves });
+    const c = new Chess();
+    for (const m of newMoves) {
+      c.move({ from: m.slice(0,2), to: m.slice(2,4), promotion: m.length > 4 ? m[4] : undefined });
+    }
+    setChess(c);
+    setReviewPly(null);
   };
 
   /* ── New Game (reset) ── */
@@ -369,13 +388,35 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
             <div className="btn-row">
               <button className="btn btn-danger btn-small" onClick={handleResign} title="Surrender the game (Bot learns from win)">Resign</button>
               <button className="btn btn-secondary btn-small" onClick={handleAbort} title="Cancel the game (No learning)">Abort</button>
+              <button className="btn btn-secondary btn-small" onClick={handleTakeback} title="Undo the last 2 moves" disabled={game.moves.length < 2 || waiting}>Takeback</button>
             </div>
           </div>
         )}
 
-        <button className="flip-btn" onClick={() => setOrientation(o => o === 'white' ? 'black' : 'white')}>
-          ⇅ Flip board
-        </button>
+        <div className="board-controls">
+          <button className="flip-btn" onClick={() => setOrientation(o => o === 'white' ? 'black' : 'white')}>
+            ⇅ Flip board
+          </button>
+          
+          {game && game.moves.length > 0 && (
+            <div className="review-nav">
+              <button 
+                className="btn btn-secondary btn-small" 
+                disabled={(reviewPly ?? game.moves.length) <= 0}
+                onClick={() => setReviewPly(Math.max(0, (reviewPly ?? game.moves.length) - 1))}
+              >
+                ◀ Back
+              </button>
+              <button 
+                className="btn btn-secondary btn-small"
+                disabled={reviewPly === null || reviewPly >= game.moves.length}
+                onClick={() => setReviewPly(reviewPly !== null && reviewPly + 1 < game.moves.length ? reviewPly + 1 : null)}
+              >
+                Forward ▶
+              </button>
+            </div>
+          )}
+        </div>
 
         {game && game.moves.length > 0 && (
           <div className="move-list">

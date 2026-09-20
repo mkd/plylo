@@ -419,3 +419,26 @@ def abort(game_id: str, request: Request, db: Session = Depends(get_db)):
     mark_game_completed(db, game, result=0.0, termination="abort")
     db.commit()
     return {"status": "ok"}
+
+@app.post("/api/games/{game_id}/takeback")
+def takeback(game_id: str, request: Request, db: Session = Depends(get_db)):
+    game = db.query(models.Game).filter(models.Game.id == game_id).first()
+    if not game or game.state != "active":
+        raise HTTPException(status_code=400, detail="Game not active")
+        
+    verify_session(game, request)
+    
+    if len(game.moves) < 2:
+        raise HTTPException(status_code=400, detail="Not enough moves to take back")
+        
+    # Delete the last two moves (one from user, one from bot, or two if bot just moved)
+    # Actually, we should delete moves until it is the visitor's turn again.
+    # Since visitor plays one color, we can just delete the last 2 moves safely if it's visitor's turn,
+    # or 1 move if it's currently the bot's turn (e.g. while bot is thinking, though that shouldn't happen).
+    # Deleting 2 moves is standard for "Take back my last move".
+    moves_to_delete = game.moves[-2:]
+    for m in moves_to_delete:
+        db.delete(m)
+        
+    db.commit()
+    return {"status": "ok"}

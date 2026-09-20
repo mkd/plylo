@@ -597,3 +597,15 @@ tbody td {
   align-items: center;
   justify-content: center;
 }
+
+.board-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.review-nav {
+  display: flex;
+  gap: 0.5rem;
+}
