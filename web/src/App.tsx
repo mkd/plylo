@@ -50,7 +50,7 @@ export default function App() {
           ))}
         </div>
         <div className="stats">
-          <p>Experience: <span>{status?.n_accepted ?? '–'}</span> games</p>
+          <p>Experience: <span>{status?.n_accepted?.toLocaleString() ?? '–'}</span> games</p>
         </div>
       </header>
 
