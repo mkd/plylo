@@ -115,25 +115,37 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
   }, []);
 
   const applyState = useCallback((data: GameState) => {
-    setGame(data);
-    const c = new Chess();
-    // Server sends UCI moves; replay them via UCI
-    for (const uci of data.moves) {
-      const from = uci.slice(0, 2);
-      const to   = uci.slice(2, 4);
-      const promo = uci.length > 4 ? uci[4] : undefined;
-      c.move({ from, to, promotion: promo });
-    }
-    setChess(c);
-    setWaiting(false);
+    setGame(prev => {
+      // If the server has fewer moves than our local state, skip the board
+      // update — our optimistic move hasn't been confirmed yet.
+      const localMoveCount = prev?.moves?.length ?? 0;
+      const serverMoveCount = data.moves.length;
 
-    if (data.state !== 'active') {
-      stopPolling();
-    } else {
-      // Is it bot's turn? show waiting indicator
-      const botColor = data.visitor_color === 'white' ? 'b' : 'w';
-      if (c.turn() === botColor) setWaiting(true);
-    }
+      if (serverMoveCount < localMoveCount && data.state === 'active') {
+        // Only update game metadata, NOT the board
+        return { ...prev!, ...data, moves: prev!.moves };
+      }
+
+      // Server is up-to-date (or ahead with a bot reply), update everything
+      const c = new Chess();
+      for (const uci of data.moves) {
+        const from = uci.slice(0, 2);
+        const to   = uci.slice(2, 4);
+        const promo = uci.length > 4 ? uci[4] : undefined;
+        c.move({ from, to, promotion: promo });
+      }
+      setChess(c);
+      setWaiting(false);
+
+      if (data.state !== 'active') {
+        stopPolling();
+      } else {
+        const botColor = data.visitor_color === 'white' ? 'b' : 'w';
+        if (c.turn() === botColor) setWaiting(true);
+      }
+
+      return data;
+    });
   }, [stopPolling]);
 
   /* ── Start Game ── */
