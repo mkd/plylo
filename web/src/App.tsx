@@ -121,12 +121,12 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
       const localMoveCount = prev?.moves?.length ?? 0;
       const serverMoveCount = data.moves.length;
 
-      if (serverMoveCount < localMoveCount && data.state === 'active') {
+      if (serverMoveCount <= localMoveCount && data.state === 'active') {
         // Only update game metadata, NOT the board
         return { ...prev!, ...data, moves: prev!.moves };
       }
 
-      // Server is up-to-date (or ahead with a bot reply), update everything
+      // Server is ahead (new bot move), update everything
       const c = new Chess();
       for (const uci of data.moves) {
         const from = uci.slice(0, 2);
@@ -229,7 +229,6 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
         axios.post(`${API}/games/${r.data.id}/move`, { uci }).then(() => {
           startPolling(r.data.id);
         }).catch(() => {
-          // If move fails, still poll the created game
           startPolling(r.data.id);
         });
       }).catch(e => {
@@ -241,10 +240,14 @@ function PlayTab({ status }: { status: ServerStatus | null }) {
       return true;
     }
 
-    // Existing game move
+    // Existing game move: optimistically update game.moves so applyState knows we are ahead
+    setGame(prev => prev ? { ...prev, moves: [...prev.moves, uci] } : prev);
+
     axios.post(`${API}/games/${game.id}/move`, { uci }).catch(() => {
+      // If it fails, revert the optimistic updates
       chess.undo();
       setChess(new Chess(chess.fen()));
+      setGame(prev => prev ? { ...prev, moves: prev.moves.slice(0, -1) } : prev);
       setWaiting(false);
     });
     return true;
